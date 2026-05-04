@@ -1,0 +1,155 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ─── PORTFOLIO PALETTE — "Materialidad Digital" ──────────────────────────── */
+:root {
+  /* Brand palette */
+  --cement: #c8c4bc;       /* microcemento alisado */
+  --iron: #1a1a1a;         /* hierro negro mate */
+  --iron-deep: #0d0d0d;    /* fondo base */
+  --iron-soft: #111111;    /* fondo intermedio */
+  --oak: #b8956a;          /* roble / madera noble */
+  --oak-light: #d4a97a;    /* acento cálido claro */
+  --off-white: #f2efe9;    /* blanco hueso cálido */
+  --ghost: #3a3a3a;        /* gris oscuro intermedio */
+  --ghost-deep: #2a2a2a;
+
+  /* shadcn tokens (kept for ui/* compatibility) */
+  --background: var(--iron-deep);
+  --foreground: var(--off-white);
+  --card: var(--iron);
+  --card-foreground: var(--off-white);
+  --popover: var(--iron);
+  --popover-foreground: var(--off-white);
+  --primary: var(--oak);
+  --primary-foreground: var(--iron-deep);
+  --secondary: var(--ghost);
+  --secondary-foreground: var(--off-white);
+  --muted: var(--ghost);
+  --muted-foreground: var(--cement);
+  --accent: var(--oak);
+  --accent-foreground: var(--iron-deep);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: rgba(242, 239, 233, 0.06);
+  --input: rgba(242, 239, 233, 0.1);
+  --ring: var(--oak);
+  --radius: 0;
+}
+
+@theme inline {
+  --font-sans: var(--font-sans), 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-serif: var(--font-serif), Georgia, 'Times New Roman', serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-cement: var(--cement);
+  --color-iron: var(--iron);
+  --color-iron-deep: var(--iron-deep);
+  --color-iron-soft: var(--iron-soft);
+  --color-oak: var(--oak);
+  --color-oak-light: var(--oak-light);
+  --color-off-white: var(--off-white);
+  --color-ghost: var(--ghost);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ─── PORTFOLIO GLOBAL STYLES ─────────────────────────────────────────────── */
+::selection {
+  background: rgba(184, 149, 106, 0.3);
+  color: var(--off-white);
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--iron-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ghost);
+}
+
+/* Hide scrollbar for horizontal galleries */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(242, 239, 233, 0.2);
+}
+
+/* Hide custom cursor on touch / coarse pointers */
+.portfolio-shell {
+  cursor: auto;
+}
+@media (hover: hover) and (pointer: fine) {
+  .portfolio-shell {
+    cursor: none;
+  }
+}
+
+@keyframes scrollPulse {
+  0% {
+    opacity: 1;
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  50% {
+    opacity: 0.4;
+    transform: scaleY(0.6);
+    transform-origin: top;
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
