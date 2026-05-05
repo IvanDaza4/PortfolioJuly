@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import type { Project } from "@/lib/portfolio/data"
+import type { Project, ImageType } from "@/lib/portfolio/data"
 import { ProjectGallery } from "./project-gallery"
 import { PLACEHOLDER_COMPONENTS } from "./placeholders"
 import { Header } from "./header"
@@ -16,9 +16,17 @@ interface ProjectDetailProps {
   nextProject: Project | null
 }
 
+type FilterOption = "render" | "planta"
+
+const FILTER_OPTIONS: { value: FilterOption; label: string }[] = [
+  { value: "render", label: "Render" },
+  { value: "planta", label: "Planos" },
+]
+
 export function ProjectDetail({ project, prevProject, nextProject }: ProjectDetailProps) {
   const heroRef = useRef<HTMLDivElement>(null)
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [activeFilter, setActiveFilter] = useState<FilterOption>("render")
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,6 +41,19 @@ export function ProjectDetail({ project, prevProject, nextProject }: ProjectDeta
   }, [])
 
   const hasGallery = project.gallery && project.gallery.length > 0
+
+  // Filtered images based on active filter
+  const filteredImages = hasGallery
+    ? project.gallery!.filter((img) => img.type === activeFilter)
+    : []
+
+  // Count images by type for filter badges
+  const imageCounts = hasGallery
+    ? {
+      render: project.gallery!.filter((img) => img.type === "render").length,
+      planta: project.gallery!.filter((img) => img.type === "planta").length,
+    }
+    : { render: 0, planta: 0 }
 
   return (
     <>
@@ -234,30 +255,81 @@ export function ProjectDetail({ project, prevProject, nextProject }: ProjectDeta
             {/* Gallery Section */}
             {hasGallery && (
               <div>
-                <div className="flex items-center gap-4 mb-10">
+                {/* Gallery Header */}
+                <div className="mb-8">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div
+                      className="w-8 h-[1px]"
+                      style={{ background: project.accent }}
+                    />
+                    <h2
+                      className="text-xs tracking-widest uppercase"
+                      style={{ color: project.accent }}
+                    >
+                      Galería del proyecto
+                    </h2>
+                  </div>
+
+                  {/* Filter Buttons - Below title */}
                   <div
-                    className="w-8 h-[1px]"
-                    style={{ background: project.accent }}
-                  />
-                  <h2
-                    className="text-xs tracking-widest uppercase"
-                    style={{ color: project.accent }}
+                    className="flex gap-6"
+                    role="group"
+                    aria-label="Filtrar imágenes por tipo"
                   >
-                    Galería del proyecto
-                  </h2>
-                  <span
-                    className="text-xs"
-                    style={{ color: "var(--cement)" }}
-                  >
-                    {project.gallery!.length} imágenes
-                  </span>
+                    {FILTER_OPTIONS.map(({ value, label }) => {
+                      const count = imageCounts[value]
+                      const isActive = activeFilter === value
+                      const isDisabled = count === 0
+
+                      return (
+                        <button
+                          key={value}
+                          onClick={() => !isDisabled && setActiveFilter(value)}
+                          disabled={isDisabled}
+                          aria-pressed={isActive}
+                          className="relative pb-2 text-xs tracking-widest uppercase motion-safe:transition-all focus-visible:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+                          style={{
+                            color: isActive ? "var(--off-white)" : "var(--cement)",
+                            borderBottom: isActive ? `2px solid ${project.accent}` : "2px solid transparent",
+                          }}
+                        >
+                          <span className="flex items-center gap-2">
+                            {label}
+                            <span
+                              className="text-[9px] tabular-nums"
+                              style={{
+                                color: project.accent,
+                              }}
+                            >
+                              {count}
+                            </span>
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
 
-                <ProjectGallery
-                  images={project.gallery!}
-                  projectName={project.name}
-                  accent={project.accent}
-                />
+                {/* Gallery Grid with transition */}
+                <div
+                  key={activeFilter}
+                  className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300"
+                >
+                  {filteredImages.length > 0 ? (
+                    <ProjectGallery
+                      images={filteredImages}
+                      projectName={project.name}
+                      accent={project.accent}
+                    />
+                  ) : (
+                    <div
+                      className="py-16 text-center"
+                      style={{ color: "var(--cement)" }}
+                    >
+                      <p className="text-sm">No hay imágenes de este tipo en el proyecto.</p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
