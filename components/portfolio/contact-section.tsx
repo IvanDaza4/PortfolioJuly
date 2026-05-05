@@ -67,6 +67,27 @@ export function ContactSection() {
         }}
       />
 
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "50%",
+          right: "-4%",
+          transform: "translateY(-50%)",
+          fontSize: "clamp(120px, 18vw, 260px)",
+          fontWeight: 800,
+          color: "transparent",
+          WebkitTextStroke: "1px rgba(200,196,188,0.04)",
+          fontFamily: "var(--font-sans)",
+          letterSpacing: "-0.05em",
+          lineHeight: 1,
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      >
+        CON
+      </div>
+
       <div style={{ position: "relative", zIndex: 2, maxWidth: 900 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 64 }}>
           <div style={{ width: 48, height: 1, background: "var(--oak)" }} />

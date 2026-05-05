@@ -39,19 +39,21 @@ export function PhilosophySection() {
         aria-hidden
         style={{
           position: "absolute",
-          top: -40,
-          right: -20,
-          fontSize: "clamp(200px,28vw,400px)",
+          top: "50%",
+          right: "-4%",
+          transform: "translateY(-50%)",
+          fontSize: "clamp(120px, 18vw, 260px)",
           fontWeight: 800,
           color: "transparent",
-          WebkitTextStroke: "1px rgba(26,26,26,0.05)",
+          WebkitTextStroke: "1px rgba((0.145 0 0,0.04)",
           fontFamily: "var(--font-sans)",
+          letterSpacing: "-0.05em",
           lineHeight: 1,
           userSelect: "none",
           pointerEvents: "none",
         }}
       >
-        F
+        FIL
       </div>
 
       <div style={{ maxWidth: 1200, position: "relative", zIndex: 2 }}>
