@@ -37,7 +37,7 @@ export function Header({ menuOpen = false, setMenuOpen }: HeaderProps) {
       }}
     >
       <a
-        href="#top"
+        href="/"
         data-hover
         aria-label="Inicio · Julieta Arquitectura"
         style={{

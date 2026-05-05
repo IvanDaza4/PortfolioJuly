@@ -9,6 +9,8 @@ import { Header } from "./header"
 import { Footer } from "./footer"
 import { Cursor } from "./cursor"
 import { Noise } from "./noise"
+import { MenuOverlay } from "@/components/portfolio/menu-overlay"
+
 
 interface ProjectDetailProps {
   project: Project
@@ -47,6 +49,7 @@ export function ProjectDetail({ project, prevProject, nextProject }: ProjectDeta
     ? project.gallery!.filter((img) => img.type === activeFilter)
     : []
 
+  const [menuOpen, setMenuOpen] = useState(false)
   // Count images by type for filter badges
   const imageCounts = hasGallery
     ? {
@@ -59,7 +62,9 @@ export function ProjectDetail({ project, prevProject, nextProject }: ProjectDeta
     <>
       <Cursor />
       <Noise />
-      <Header />
+      <MenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <Header menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+
 
       <main style={{ background: "var(--iron-deep)", minHeight: "100vh" }}>
         {/* Cinematic Hero */}
@@ -99,7 +104,7 @@ export function ProjectDetail({ project, prevProject, nextProject }: ProjectDeta
           <div
             className="absolute inset-0"
             style={{
-              background: `linear-gradient(to bottom, transparent 0%, transparent 40%, ${project.placeholder.bg[0]}EE 100%)`,
+              background: `linear-gradient(to bottom, transparent 0%, transparent 80%, ${project.placeholder.bg[0]}EE 100%)`,
             }}
           />
 

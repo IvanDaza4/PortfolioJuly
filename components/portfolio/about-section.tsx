@@ -37,8 +37,11 @@ const SKILLS = [
   "Docencia",
 ] as const
 
+
+
 export function AboutSection() {
   const [visible, setVisible] = useState(false)
+  const [imgError, setImgError] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -158,28 +161,21 @@ export function AboutSection() {
                   overflow: "hidden",
                 }}
               >
-                <svg
-                  viewBox="0 0 300 400"
-                  aria-hidden
+                <img
+                  src="/fotoperfil.jpeg"
+                  alt="Julieta Bruzzese — Arquitecta"
+                  onError={() => setImgError(true)}
                   style={{
                     position: "absolute",
-                    bottom: 0,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    width: "75%",
-                    opacity: 0.12,
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "center top",
+                    display: imgError ? "none" : "block",
+                    filter: "grayscale(8%) contrast(1.04)",
                   }}
-                  fill="var(--oak)"
-                >
-                  <ellipse cx="150" cy="80" rx="42" ry="48" />
-                  <rect x="138" y="124" width="24" height="28" rx="4" />
-                  <path d="M80 152 Q80 130 150 130 Q220 130 220 152 L230 290 Q230 310 210 310 L90 310 Q70 310 70 290 Z" />
-                  <path d="M90 165 Q50 200 44 270 Q42 285 56 285 Q68 285 72 270 L90 210Z" />
-                  <path d="M210 165 Q250 200 256 270 Q258 285 244 285 Q232 285 228 270 L210 210Z" />
-                  <path d="M100 308 Q96 380 92 400 L140 400 L148 320Z" />
-                  <path d="M200 308 Q204 380 208 400 L160 400 L152 320Z" />
-                  <path d="M108 70 Q105 25 150 22 Q195 25 192 70 Q185 40 150 38 Q115 40 108 70Z" />
-                </svg>
+                />
 
                 <svg
                   aria-hidden
@@ -195,7 +191,7 @@ export function AboutSection() {
                     <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch" />
                     <feColorMatrix type="saturate" values="0" />
                   </filter>
-                  <rect width="100%" height="100%" filter="url(#photoGrain)" />
+                  <rect width="100%" height="100%" filter="url('/fotoperfil.jpeg')" />
                 </svg>
 
                 <div
@@ -228,7 +224,7 @@ export function AboutSection() {
                       color: "rgba(242,239,233,0.3)",
                     }}
                   >
-                    2024
+                    2026
                   </span>
                 </div>
               </div>
@@ -290,7 +286,7 @@ export function AboutSection() {
                   textTransform: "uppercase",
                 }}
               >
-                — Julieta, 2024
+                — Julieta, 2026
               </figcaption>
             </figure>
           </div>
@@ -318,7 +314,7 @@ export function AboutSection() {
               >
                 Julieta
                 <br />
-                <span style={{ color: "var(--oak)" }}>Méndez</span>
+                <span style={{ color: "var(--oak)" }}>Bruzzese</span>
               </h2>
               <p
                 style={{
@@ -328,26 +324,28 @@ export function AboutSection() {
                   textTransform: "uppercase",
                 }}
               >
-                Arquitecta · Docente · Buenos Aires
+                Arquitecta · Buenos Aires
               </p>
             </div>
 
             <div style={{ marginBottom: 56 }}>
               <p style={{ fontSize: 15, color: "var(--cement)", lineHeight: 1.85, marginBottom: 20 }}>
-                Soy arquitecta formada en la Universidad de Buenos Aires con especialización en
-                arquitectura residencial, cultural y de paisaje. Mi práctica combina rigor técnico
-                con una mirada poética sobre los materiales y el habitar contemporáneo.
+                Soy estudiante de cuarto año de la carrera de Arquitectura en la Universidad de Buenos Aires (FADU),
+                y complemento mi perfil académico con formación especializada en Diseño de Interiores, cursada en DFA
+                Design durante el período 2022-2023. Cuento con un sólido manejo de herramientas digitales y una
+                comprensión integral de todo el proceso constructivo.
               </p>
               <p style={{ fontSize: 15, color: "var(--cement)", lineHeight: 1.85, marginBottom: 20 }}>
-                Durante cinco años trabajé en Europa —principalmente en España— junto a equipos de
-                referencia internacional antes de regresar a Argentina para fundar mi estudio. Hoy
-                lidero proyectos de escala doméstica y cultural con un enfoque profundamente
-                situado: cada obra responde a su geografía, su materialidad local y las personas
-                que la habitarán.
+                A lo largo de mis más de dos años de experiencia profesional en un estudio de arquitectura, me he
+                desempeñado principalmente como dibujante. Mi trabajo diario abarca el desarrollo detallado de planos
+                técnicos y ejecutivos, así como el dibujo y la coordinación de instalaciones eléctricas, sanitarias
+                y afines. Además, tengo a mi cargo el armado y la actualización constante de la documentación de obra.
               </p>
               <p style={{ fontSize: 15, color: "var(--cement)", lineHeight: 1.85 }}>
-                Además de la práctica proyectual, ejerzo como docente invitada en FADU-UBA y
-                participo activamente en foros de arquitectura latinoamericana.
+                Más allá del trabajo técnico, brindo apoyo activo en tareas de proyecto, realizando los ajustes
+                necesarios según los requerimientos específicos del estudio. Esta experiencia de gabinete se completa
+                con mi participación en visitas y seguimiento de obra, lo que me permite conectar la precisión
+                de la planimetría con la realidad material de la ejecución.
               </p>
             </div>
 
@@ -361,31 +359,7 @@ export function AboutSection() {
               }}
             />
 
-            <div>
-              <h3
-                style={{
-                  fontSize: 10,
-                  letterSpacing: "0.28em",
-                  color: "var(--oak)",
-                  textTransform: "uppercase",
-                  marginBottom: 32,
-                }}
-              >
-                Trayectoria
-              </h3>
 
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                {TIMELINE.map((item, i) => (
-                  <TimelineItem
-                    key={item.year}
-                    item={item}
-                    index={i}
-                    visible={visible}
-                    isLast={i === TIMELINE.length - 1}
-                  />
-                ))}
-              </div>
-            </div>
 
             <div
               style={{
