@@ -20,12 +20,10 @@ export function ProjectGallery({ images, projectName, accent }: ProjectGalleryPr
   const touchStartX = useRef(0)
   const touchEndX = useRef(0)
 
-  // Necesario para que createPortal funcione en SSR (Next.js)
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Keyboard navigation
   useEffect(() => {
     if (!lightboxOpen) return
 
@@ -48,7 +46,6 @@ export function ProjectGallery({ images, projectName, accent }: ProjectGalleryPr
     }
   }, [lightboxOpen, images.length])
 
-  // Touch gestures for swipe
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX
   }
@@ -59,9 +56,7 @@ export function ProjectGallery({ images, projectName, accent }: ProjectGalleryPr
 
   const handleTouchEnd = () => {
     const diff = touchStartX.current - touchEndX.current
-    const threshold = 50
-
-    if (Math.abs(diff) > threshold) {
+    if (Math.abs(diff) > 50) {
       if (diff > 0) {
         setActiveIndex((prev) => (prev + 1) % images.length)
       } else {
@@ -75,42 +70,25 @@ export function ProjectGallery({ images, projectName, accent }: ProjectGalleryPr
     setLightboxOpen(true)
   }, [])
 
-  // Determine grid layout based on image count and aspects
-  const getGridConfig = () => {
-    const gridItems: { span: string; order: number }[] = []
-
-    images.forEach((img, i) => {
-      let colSpan = "1"
-      let rowSpan = "1"
-
-      // Create asymmetric layout
-      if (i === 0) {
-        // First image is always large
-        colSpan = img.aspect === "portrait" ? "1" : "2"
-        rowSpan = "2"
-      } else if (img.aspect === "portrait") {
-        rowSpan = "2"
-      } else if (img.aspect === "landscape" && i % 3 === 0) {
-        colSpan = "2"
-      }
-
-      gridItems.push({
-        span: `col-span-${colSpan} row-span-${rowSpan}`,
-        order: i,
-      })
-    })
-
-    return gridItems
-  }
-
-  const gridConfig = getGridConfig()
-
-  // ─── Lightbox markup (se monta via portal en document.body) ───────────────
+  // ─── Lightbox ─────────────────────────────────────────────────────────────
+  // CRÍTICO: z-index altísimo (2147483647 = max safe int) y position fixed
+  // explícito por inline style para garantizar que esté SOBRE el navbar del sitio.
   const lightboxMarkup = (
     <div
       ref={lightboxRef}
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: "rgba(10, 10, 10, 0.97)" }}
+      className="flex flex-col"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: "100vw",
+        height: "100vh",
+        background: "rgba(8, 8, 8, 0.98)",
+        zIndex: 2147483647,
+        isolation: "isolate",
+      }}
       role="dialog"
       aria-modal="true"
       aria-label={`Galería de imágenes de ${projectName}`}
@@ -118,155 +96,299 @@ export function ProjectGallery({ images, projectName, accent }: ProjectGalleryPr
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Close button */}
-      <button
-        type="button"
-        onClick={() => setLightboxOpen(false)}
-        className="absolute top-6 right-6 z-10 p-3 rounded-full motion-safe:transition-all motion-safe:duration-300 hover:bg-white/10"
-        aria-label="Cerrar galería"
+      {/* ── TOP BAR ── */}
+      <div
+        className="relative flex items-center justify-between flex-shrink-0"
+        style={{
+          padding: "1rem 1.5rem",
+          background: "rgba(0,0,0,0.4)",
+          backdropFilter: "blur(8px)",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          zIndex: 2,
+        }}
       >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="white"
-          strokeWidth="1.5"
+        {/* Botón Volver */}
+        <button
+          type="button"
+          onClick={() => setLightboxOpen(false)}
+          className="flex items-center gap-3 group cursor-pointer"
+          style={{ position: "relative", zIndex: 3 }}
+          aria-label="Volver a la galería"
         >
-          <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
+          <span
+            className="flex items-center justify-center motion-safe:transition-all motion-safe:duration-300 group-hover:bg-white/10"
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "9999px",
+              border: "1px solid rgba(255,255,255,0.3)",
+              backgroundColor: "rgba(255,255,255,0.05)",
+            }}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              className="motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:-translate-x-0.5"
+            >
+              <path
+                d="M19 12H5M5 12l7 7M5 12l7-7"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          <span
+            className="hidden sm:block opacity-70 group-hover:opacity-100 motion-safe:transition-opacity motion-safe:duration-300"
+            style={{
+              color: "white",
+              fontSize: "11px",
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+              fontWeight: 500,
+            }}
+          >
+            Volver
+          </span>
+        </button>
 
-      {/* Project name */}
-      <div className="absolute top-6 left-6 z-10">
+        {/* Nombre del proyecto */}
         <p
-          className="text-xs tracking-widest uppercase mb-1"
-          style={{ color: "rgba(255,255,255,0.4)" }}
+          className="absolute inset-x-0 text-center pointer-events-none"
+          style={{
+            color: "rgba(255,255,255,0.5)",
+            fontSize: "11px",
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+          }}
         >
           {projectName}
         </p>
-        <p className="text-sm font-medium" style={{ color: accent }}>
-          {String(activeIndex + 1).padStart(2, "0")} /{" "}
-          {String(images.length).padStart(2, "0")}
-        </p>
-      </div>
 
-      {/* Main image */}
-      <div className="relative w-full h-full max-w-6xl max-h-[80vh] mx-auto px-16">
-        {images.map((image, index) => (
-          <div
-            key={`lightbox-${image.src}-${index}`}
-            className="absolute inset-0 flex items-center justify-center motion-safe:transition-all motion-safe:duration-500"
-            style={{
-              opacity: activeIndex === index ? 1 : 0,
-              transform:
-                activeIndex === index
-                  ? "scale(1) translateX(0)"
-                  : index < activeIndex
-                    ? "scale(0.95) translateX(-50px)"
-                    : "scale(0.95) translateX(50px)",
-              pointerEvents: activeIndex === index ? "auto" : "none",
-            }}
+        {/* Contador + cerrar */}
+        <div
+          className="flex items-center"
+          style={{ gap: "1rem", position: "relative", zIndex: 3 }}
+        >
+          <span
+            className="tabular-nums"
+            style={{ color: accent, fontSize: "14px", fontWeight: 500 }}
           >
-            <Image
-              src={image.src}
-              alt={image.alt}
-              fill
-              className="object-contain"
-              sizes="100vw"
-              priority={activeIndex === index}
-            />
-          </div>
-        ))}
-      </div>
+            {String(activeIndex + 1).padStart(2, "0")}
+            <span style={{ color: "rgba(255,255,255,0.3)" }}>
+              {" / "}
+              {String(images.length).padStart(2, "0")}
+            </span>
+          </span>
 
-      {/* Image caption */}
-      <div className="absolute bottom-8 left-0 right-0 text-center">
-        <p className="text-white/80 text-sm md:text-base px-6">
-          {images[activeIndex].alt}
-        </p>
-      </div>
-
-      {/* Navigation arrows */}
-      <button
-        type="button"
-        onClick={() => setActiveIndex((prev) => (prev - 1 + images.length) % images.length)}
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 p-4 rounded-full motion-safe:transition-all motion-safe:duration-300 hover:bg-white/10 group"
-        aria-label="Imagen anterior"
-      >
-        <svg
-          width="32"
-          height="32"
-          viewBox="0 0 24 24"
-          fill="none"
-          className="motion-safe:transition-transform motion-safe:group-hover:-translate-x-1"
-        >
-          <path
-            d="M15 18l-6-6 6-6"
-            stroke="white"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </button>
-
-      <button
-        type="button"
-        onClick={() => setActiveIndex((prev) => (prev + 1) % images.length)}
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 p-4 rounded-full motion-safe:transition-all motion-safe:duration-300 hover:bg-white/10 group"
-        aria-label="Siguiente imagen"
-      >
-        <svg
-          width="32"
-          height="32"
-          viewBox="0 0 24 24"
-          fill="none"
-          className="motion-safe:transition-transform motion-safe:group-hover:translate-x-1"
-        >
-          <path
-            d="M9 18l6-6-6-6"
-            stroke="white"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </button>
-
-      {/* Thumbnail strip */}
-      <div className="absolute bottom-20 left-0 right-0 px-4 overflow-x-auto">
-        <div className="flex justify-center gap-2 md:gap-3">
-          {images.map((image, index) => (
-            <button
-              key={`thumb-${image.src}-${index}`}
-              type="button"
-              onClick={() => setActiveIndex(index)}
-              className="relative flex-shrink-0 overflow-hidden rounded-sm motion-safe:transition-all motion-safe:duration-300"
-              style={{
-                width: activeIndex === index ? 72 : 48,
-                height: activeIndex === index ? 48 : 32,
-                opacity: activeIndex === index ? 1 : 0.5,
-                border: activeIndex === index ? `2px solid ${accent}` : "2px solid transparent",
-              }}
-              aria-label={`Ver imagen ${index + 1}`}
-              aria-current={activeIndex === index ? "true" : undefined}
+          <button
+            type="button"
+            onClick={() => setLightboxOpen(false)}
+            className="flex items-center justify-center motion-safe:transition-all motion-safe:duration-300 hover:bg-white/10 cursor-pointer"
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "9999px",
+              border: "1px solid rgba(255,255,255,0.3)",
+              backgroundColor: "rgba(255,255,255,0.05)",
+            }}
+            aria-label="Cerrar galería"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="1.5"
             >
-              <Image
-                src={image.src}
-                alt=""
-                fill
-                className="object-cover"
-                sizes="72px"
-              />
-            </button>
-          ))}
+              <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
         </div>
       </div>
 
-      {/* Swipe hint (mobile) */}
-      <div className="absolute bottom-4 left-0 right-0 text-center md:hidden">
-        <p className="text-xs text-white/30 tracking-wider uppercase">
+      {/* ── MAIN IMAGE AREA ── */}
+      <div
+        className="relative flex items-center"
+        style={{ flex: 1, overflow: "hidden", minHeight: 0 }}
+      >
+        {/* Flecha izquierda */}
+        <button
+          type="button"
+          onClick={() =>
+            setActiveIndex((prev) => (prev - 1 + images.length) % images.length)
+          }
+          className="motion-safe:transition-all motion-safe:duration-300 hover:bg-white/10 group cursor-pointer"
+          style={{
+            position: "absolute",
+            left: "1rem",
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 5,
+            width: "44px",
+            height: "44px",
+            borderRadius: "9999px",
+            border: "1px solid rgba(255,255,255,0.25)",
+            backgroundColor: "rgba(0,0,0,0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          aria-label="Imagen anterior"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M15 18l-6-6 6-6"
+              stroke="white"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
+        {/* Imágenes */}
+        <div
+          className="relative mx-auto"
+          style={{
+            width: "100%",
+            height: "100%",
+            maxWidth: "1280px",
+            paddingLeft: "5rem",
+            paddingRight: "5rem",
+          }}
+        >
+          {images.map((image, index) => (
+            <div
+              key={`lightbox-${image.src}-${index}`}
+              className="motion-safe:transition-all motion-safe:duration-500"
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                opacity: activeIndex === index ? 1 : 0,
+                transform:
+                  activeIndex === index
+                    ? "scale(1) translateX(0)"
+                    : index < activeIndex
+                      ? "scale(0.95) translateX(-40px)"
+                      : "scale(0.95) translateX(40px)",
+                pointerEvents: activeIndex === index ? "auto" : "none",
+              }}
+            >
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                className="object-contain"
+                sizes="100vw"
+                priority={activeIndex === index}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Flecha derecha */}
+        <button
+          type="button"
+          onClick={() => setActiveIndex((prev) => (prev + 1) % images.length)}
+          className="motion-safe:transition-all motion-safe:duration-300 hover:bg-white/10 group cursor-pointer"
+          style={{
+            position: "absolute",
+            right: "1rem",
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 5,
+            width: "44px",
+            height: "44px",
+            borderRadius: "9999px",
+            border: "1px solid rgba(255,255,255,0.25)",
+            backgroundColor: "rgba(0,0,0,0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          aria-label="Siguiente imagen"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M9 18l6-6-6-6"
+              stroke="white"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
+
+      {/* ── BOTTOM BAR ── */}
+      <div
+        className="flex-shrink-0"
+        style={{
+          padding: "0.75rem 0 1rem",
+          background: "rgba(0,0,0,0.4)",
+          backdropFilter: "blur(8px)",
+          borderTop: "1px solid rgba(255,255,255,0.06)",
+          zIndex: 2,
+        }}
+      >
+        <p
+          className="text-center px-6 mb-3 truncate"
+          style={{ color: "rgba(255,255,255,0.7)", fontSize: "14px" }}
+        >
+          {images[activeIndex].alt}
+        </p>
+
+        <div className="overflow-x-auto px-4">
+          <div className="flex justify-center" style={{ gap: "0.5rem" }}>
+            {images.map((image, index) => (
+              <button
+                key={`thumb-${image.src}-${index}`}
+                type="button"
+                onClick={() => setActiveIndex(index)}
+                className="relative flex-shrink-0 overflow-hidden motion-safe:transition-all motion-safe:duration-300 cursor-pointer"
+                style={{
+                  width: activeIndex === index ? 72 : 48,
+                  height: activeIndex === index ? 48 : 32,
+                  opacity: activeIndex === index ? 1 : 0.45,
+                  border:
+                    activeIndex === index
+                      ? `2px solid ${accent}`
+                      : "2px solid transparent",
+                  borderRadius: "2px",
+                }}
+                aria-label={`Ver imagen ${index + 1}`}
+                aria-current={activeIndex === index ? "true" : undefined}
+              >
+                <Image
+                  src={image.src}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="72px"
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <p
+          className="text-center md:hidden"
+          style={{
+            color: "rgba(255,255,255,0.25)",
+            fontSize: "10px",
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            marginTop: "0.5rem",
+          }}
+        >
           Desliza para navegar
         </p>
       </div>
@@ -275,7 +397,6 @@ export function ProjectGallery({ images, projectName, accent }: ProjectGalleryPr
 
   return (
     <>
-      {/* Asymmetric Grid Gallery */}
       <div
         className="grid gap-3 md:gap-4"
         style={{
@@ -286,7 +407,6 @@ export function ProjectGallery({ images, projectName, accent }: ProjectGalleryPr
       >
         {images.map((image, index) => {
           const isHovered = hoveredIndex === index
-          const config = gridConfig[index]
 
           return (
             <button
@@ -305,18 +425,15 @@ export function ProjectGallery({ images, projectName, accent }: ProjectGalleryPr
                     : image.aspect === "landscape" && index % 3 === 0
                       ? "span 2"
                       : "span 1",
-                gridRow: index === 0 || image.aspect === "portrait" ? "span 2" : "span 1",
-                focusRing: accent,
+                gridRow:
+                  index === 0 || image.aspect === "portrait" ? "span 2" : "span 1",
                 ["--tw-ring-color" as string]: accent,
               }}
               aria-label={`Ver ${image.alt} en pantalla completa`}
             >
-              {/* Image */}
               <div
                 className="absolute inset-0 motion-safe:transition-transform motion-safe:duration-700 motion-safe:ease-out"
-                style={{
-                  transform: isHovered ? "scale(1.08)" : "scale(1)",
-                }}
+                style={{ transform: isHovered ? "scale(1.08)" : "scale(1)" }}
               >
                 <Image
                   src={image.src}
@@ -327,7 +444,6 @@ export function ProjectGallery({ images, projectName, accent }: ProjectGalleryPr
                 />
               </div>
 
-              {/* Gradient overlay on hover */}
               <div
                 className="absolute inset-0 motion-safe:transition-opacity motion-safe:duration-500"
                 style={{
@@ -336,7 +452,6 @@ export function ProjectGallery({ images, projectName, accent }: ProjectGalleryPr
                 }}
               />
 
-              {/* Info reveal on hover */}
               <div
                 className="absolute bottom-0 left-0 right-0 p-4 md:p-6 motion-safe:transition-all motion-safe:duration-500"
                 style={{
@@ -348,14 +463,14 @@ export function ProjectGallery({ images, projectName, accent }: ProjectGalleryPr
                   className="text-xs tracking-widest uppercase mb-1"
                   style={{ color: "rgba(255,255,255,0.7)" }}
                 >
-                  {String(index + 1).padStart(2, "0")} / {String(images.length).padStart(2, "0")}
+                  {String(index + 1).padStart(2, "0")} /{" "}
+                  {String(images.length).padStart(2, "0")}
                 </p>
                 <p className="text-sm md:text-base font-medium text-white line-clamp-2">
                   {image.alt}
                 </p>
               </div>
 
-              {/* Corner accent on hover */}
               <div
                 className="absolute top-4 right-4 w-8 h-8 motion-safe:transition-all motion-safe:duration-500"
                 style={{
@@ -378,9 +493,6 @@ export function ProjectGallery({ images, projectName, accent }: ProjectGalleryPr
         })}
       </div>
 
-      {/* Immersive Lightbox — montado en document.body via portal
-          para evitar que cualquier transform/filter de ancestros
-          rompa el contexto de position: fixed */}
       {lightboxOpen && mounted && createPortal(lightboxMarkup, document.body)}
     </>
   )
