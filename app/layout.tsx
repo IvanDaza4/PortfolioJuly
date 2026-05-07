@@ -29,10 +29,10 @@ export const metadata: Metadata = {
     "interiorismo",
     "Julieta Méndez",
   ],
-  authors: [{ name: "Julieta Méndez" }],
-  creator: "Julieta Méndez",
+  authors: [{ name: "Julieta Bruzzese" }],
+  creator: "Julieta Bruzzese",
   openGraph: {
-    title: "Julieta Méndez · Arquitectura",
+    title: "Julieta Bruzzese · Arquitectura",
     description:
       "Arquitectura de precisión material. Espacios que articulan silencio, escala y emoción.",
     locale: "es_AR",

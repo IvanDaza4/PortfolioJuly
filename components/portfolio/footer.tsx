@@ -1,10 +1,5 @@
 "use client"
 
-const SOCIALS = [
-  { label: "Instagram", href: "https://instagram.com" },
-  { label: "LinkedIn", href: "https://linkedin.com" },
-  { label: "Behance", href: "https://behance.net" },
-] as const
 
 export function Footer() {
   return (
@@ -27,31 +22,9 @@ export function Footer() {
           letterSpacing: "0.1em",
         }}
       >
-        © {new Date().getFullYear()} Julieta Arquitectura
+        © {new Date().getFullYear()} Julieta Bruzzese Estraviz
       </span>
-      <nav aria-label="Redes sociales" style={{ display: "flex", gap: 32 }}>
-        {SOCIALS.map((net) => (
-          <a
-            key={net.label}
-            href={net.href}
-            target="_blank"
-            rel="noreferrer noopener"
-            data-hover
-            style={{
-              fontSize: 11,
-              color: "var(--ghost)",
-              letterSpacing: "0.12em",
-              textDecoration: "none",
-              textTransform: "uppercase",
-              transition: "color 0.3s ease",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--oak)")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ghost)")}
-          >
-            {net.label}
-          </a>
-        ))}
-      </nav>
+
     </footer>
   )
 }

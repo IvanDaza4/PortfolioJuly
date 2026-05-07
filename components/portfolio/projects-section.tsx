@@ -97,9 +97,7 @@ export function ProjectsSection() {
               >
                 Proyectos
               </h2>
-              <span style={{ fontSize: 11, color: "var(--ghost-deep)", letterSpacing: "0.15em" }}>
-                2022 — 2024
-              </span>
+              
             </div>
           </header>
 

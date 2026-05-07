@@ -2,26 +2,73 @@
 
 import { useState, type CSSProperties, type FormEvent } from "react"
 
+// ─────────────────────────────────────────────
+// CONFIGURACIÓN — reemplazá este valor por el
+// endpoint real de tu formulario en Formspree.
+// Pasos:
+//   1. Registrarse en https://formspree.io
+//   2. Crear un nuevo formulario ("New Form")
+//   3. Copiar el endpoint con el formato:
+//      https://formspree.io/f/XXXXXXXX
+// ─────────────────────────────────────────────
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/mjgloonz"
+
 const CONTACT_DETAILS = [
-  { label: "Email", value: "hola@julietaarq.com", href: "mailto:hola@julietaarq.com" },
-  { label: "Teléfono", value: "+54 11 0000-0000", href: "tel:+541100000000" },
+  { label: "Email", value: "julybruzz@gmail.com", href: "mailto:julybruzz@gmail.com" },
+  { label: "Teléfono", value: "+54 11 2817-0350", href: "tel:+541128170350" },
   { label: "Estudio", value: "Buenos Aires, AR", href: null },
 ] as const
 
+type Status = "idle" | "loading" | "sent" | "error"
 type FieldName = "name" | "topic"
 
 export function ContactSection() {
   const [fields, setFields] = useState({ name: "", topic: "" })
-  const [sent, setSent] = useState(false)
+  const [status, setStatus] = useState<Status>("idle")
   const [focused, setFocused] = useState<FieldName | null>(null)
 
-  const canSend = fields.name.trim().length > 0 && fields.topic.trim().length > 0
+  const canSend =
+    fields.name.trim().length > 0 &&
+    fields.topic.trim().length > 0 &&
+    status !== "loading"
 
-  const handleSend = (e: FormEvent<HTMLFormElement>) => {
+  // ─── Envío real a Formspree ───────────────
+  const handleSend = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (canSend) setSent(true)
+    if (!canSend) return
+
+    setStatus("loading")
+
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          name: fields.name.trim(),
+          topic: fields.topic.trim(),
+          // Si en el futuro agregás un campo de email al form,
+          // mapealo así para que Formspree lo use como Reply-To:
+          // _replyto: fields.email,
+        }),
+      })
+
+      if (res.ok) {
+        setStatus("sent")
+      } else {
+        const data = await res.json().catch(() => null)
+        console.error("Formspree error:", data)
+        setStatus("error")
+      }
+    } catch (err) {
+      console.error("Network error:", err)
+      setStatus("error")
+    }
   }
 
+  // ─── Estilos de inputs ────────────────────
   const inputStyle = (field: FieldName): CSSProperties => ({
     background: "none",
     border: "none",
@@ -36,7 +83,12 @@ export function ContactSection() {
     letterSpacing: "-0.02em",
     display: "inline-block",
     textAlign: "center",
+    opacity: status === "loading" ? 0.5 : 1,
+    pointerEvents: status === "loading" ? "none" : "auto",
   })
+
+  const buttonEnabled = canSend && status !== "loading"
+  const buttonLabel = status === "loading" ? "Enviando…" : "Enviar consulta"
 
   return (
     <section
@@ -53,6 +105,7 @@ export function ContactSection() {
         overflow: "hidden",
       }}
     >
+      {/* Círculo decorativo de fondo */}
       <div
         aria-hidden
         style={{
@@ -67,6 +120,7 @@ export function ContactSection() {
         }}
       />
 
+      {/* Texto decorativo "CON" */}
       <div
         aria-hidden
         style={{
@@ -89,6 +143,8 @@ export function ContactSection() {
       </div>
 
       <div style={{ position: "relative", zIndex: 2, maxWidth: 900 }}>
+
+        {/* Eyebrow label */}
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 64 }}>
           <div style={{ width: 48, height: 1, background: "var(--oak)" }} />
           <span
@@ -103,6 +159,7 @@ export function ContactSection() {
           </span>
         </div>
 
+        {/* Título principal */}
         <h2
           style={{
             fontSize: "clamp(32px, 4.5vw, 64px)",
@@ -117,7 +174,8 @@ export function ContactSection() {
           Hablemos de tu proyecto
         </h2>
 
-        {sent ? (
+        {/* ────── ESTADO: ENVIADO ────── */}
+        {status === "sent" && (
           <div
             role="status"
             aria-live="polite"
@@ -129,10 +187,50 @@ export function ContactSection() {
               lineHeight: 1.6,
             }}
           >
-            Gracias, {fields.name}. <br />
-            <span style={{ color: "var(--cement)" }}>Estaremos en contacto pronto.</span>
+            Gracias, {fields.name}.{" "}
+            <br />
+            <span style={{ color: "var(--cement)" }}>
+              Estaremos en contacto pronto.
+            </span>
           </div>
-        ) : (
+        )}
+
+        {/* ────── ESTADO: ERROR ────── */}
+        {status === "error" && (
+          <div
+            role="alert"
+            aria-live="assertive"
+            style={{
+              fontSize: "clamp(14px, 1.8vw, 22px)",
+              color: "rgba(242,239,233,0.7)",
+              fontFamily: "var(--font-sans)",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.7,
+              marginBottom: 40,
+              borderLeft: "2px solid var(--oak)",
+              paddingLeft: 20,
+            }}
+          >
+            Hubo un problema al enviar el mensaje.
+            <br />
+            <span style={{ color: "var(--cement)", fontSize: "0.85em" }}>
+              Por favor escribinos directamente a{" "}
+              <a
+                href="mailto:hola@julietaarq.com"
+                style={{
+                  color: "var(--oak)",
+                  textDecoration: "underline",
+                  textUnderlineOffset: 4,
+                }}
+              >
+                hola@julietaarq.com
+              </a>
+            </span>
+          </div>
+        )}
+
+        {/* ────── FORMULARIO (idle | loading | error) ────── */}
+        {status !== "sent" && (
           <form onSubmit={handleSend} noValidate>
             <div
               style={{
@@ -145,9 +243,12 @@ export function ContactSection() {
                 display: "flex",
                 alignItems: "baseline",
                 gap: "0 12px",
+                opacity: status === "loading" ? 0.6 : 1,
+                transition: "opacity 0.3s ease",
               }}
             >
               <span>Hola, mi nombre es</span>
+
               <label htmlFor="contact-name" className="sr-only">
                 Tu nombre
               </label>
@@ -161,8 +262,11 @@ export function ContactSection() {
                 style={inputStyle("name")}
                 autoComplete="name"
                 required
+                disabled={status === "loading"}
               />
+
               <span>y quiero hablar sobre</span>
+
               <label htmlFor="contact-topic" className="sr-only">
                 Tema o proyecto
               </label>
@@ -175,34 +279,67 @@ export function ContactSection() {
                 placeholder="tu proyecto"
                 style={inputStyle("topic")}
                 required
+                disabled={status === "loading"}
               />
+
               <span>.</span>
             </div>
 
+            {/* Botón de envío */}
             <button
               type="submit"
-              disabled={!canSend}
+              disabled={!buttonEnabled}
               data-hover
+              aria-busy={status === "loading"}
               style={{
                 marginTop: 64,
-                background: canSend ? "var(--oak)" : "transparent",
-                border: `1px solid ${canSend ? "var(--oak)" : "rgba(242,239,233,0.15)"}`,
-                color: canSend ? "var(--iron-deep)" : "var(--ghost)",
+                background: buttonEnabled ? "var(--oak)" : "transparent",
+                border: `1px solid ${buttonEnabled ? "var(--oak)" : "rgba(242,239,233,0.15)"}`,
+                color: buttonEnabled ? "var(--iron-deep)" : "var(--ghost)",
                 padding: "18px 48px",
                 fontSize: 11,
                 letterSpacing: "0.25em",
                 textTransform: "uppercase",
-                cursor: canSend ? "pointer" : "default",
+                cursor: buttonEnabled ? "pointer" : "default",
                 fontFamily: "inherit",
                 fontWeight: 700,
                 transition: "all 0.4s ease",
+                position: "relative",
+                overflow: "hidden",
               }}
             >
-              Enviar consulta
+              {buttonLabel}
+
+              {/* Barra de progreso sutil durante el loading */}
+              {status === "loading" && (
+                <span
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    height: 2,
+                    width: "100%",
+                    background: "var(--iron-deep)",
+                    opacity: 0.35,
+                    animation: "jq_loadingBar 1.2s ease-in-out infinite",
+                  }}
+                />
+              )}
             </button>
+
+            {/* Keyframe inline — prefijo "jq_" para evitar colisiones */}
+            <style>{`
+              @keyframes jq_loadingBar {
+                0%   { transform: translateX(-100%); }
+                50%  { transform: translateX(0%); }
+                100% { transform: translateX(100%); }
+              }
+            `}</style>
           </form>
         )}
 
+        {/* ────── DATOS DE CONTACTO ────── */}
         <div
           style={{
             marginTop: 100,
@@ -226,6 +363,7 @@ export function ContactSection() {
               >
                 {info.label}
               </div>
+
               {info.href ? (
                 <a
                   href={info.href}
@@ -243,13 +381,20 @@ export function ContactSection() {
                   {info.value}
                 </a>
               ) : (
-                <div style={{ fontSize: 14, color: "var(--cement)", letterSpacing: "0.02em" }}>
+                <div
+                  style={{
+                    fontSize: 14,
+                    color: "var(--cement)",
+                    letterSpacing: "0.02em",
+                  }}
+                >
                   {info.value}
                 </div>
               )}
             </div>
           ))}
         </div>
+
       </div>
     </section>
   )

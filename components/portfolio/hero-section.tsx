@@ -37,54 +37,6 @@ function useEntrance(delay = 0) {
 
 // ── Sub-componentes ────────────────────────────────────────────────────────
 
-function Nav({ visible }) {
-  return (
-    <nav
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingTop: "clamp(28px, 4vh, 44px)",
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(-12px)",
-        transition: "opacity 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s, transform 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s",
-      }}
-    >
-
-      <ul style={{ display: "flex", gap: 36, listStyle: "none", margin: 0, padding: 0 }}>
-        {["proyectos", "Proceso", "Estudio", "Contacto"].map((item) => (
-          <li key={item}>
-            <NavLink href={`#${item.toLowerCase()}`}>{item}</NavLink>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  )
-}
-
-function NavLink({ href, children }) {
-  const [hovered, setHovered] = useState(false)
-  return (
-    <a
-      href={href}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        fontFamily: "var(--font-sans, 'DM Sans', sans-serif)",
-        fontSize: 10.5,
-        fontWeight: 400,
-        letterSpacing: "0.2em",
-        color: hovered ? styles.dust : styles.stone,
-        textDecoration: "none",
-        textTransform: "uppercase",
-        transition: "color 0.3s ease",
-      }}
-    >
-      {children}
-    </a>
-  )
-}
-
 function BackgroundPanel() {
   return (
     <div
@@ -111,11 +63,10 @@ function BackgroundPanel() {
         style={{
           width: "100%",
           height: "100%",
-          backgroundImage: "url('/cc3.jpeg')",
+          backgroundImage: "url('/cc3.png')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           filter: "grayscale(15%) contrast(1.05)",
-          // Pan sutil: agregar keyframe en globals.css si se desea
         }}
       />
     </div>
@@ -179,7 +130,6 @@ function ScrollIndicator({ visible }) {
       >
         Scroll
       </span>
-      {/* Agrega en globals.css: @keyframes scrollFill { 0%{height:0%;top:0} 50%{height:100%;top:0} 51%{height:100%;top:0} 100%{height:0%;top:100%} } */}
       <div
         style={{
           width: 1,
@@ -224,7 +174,7 @@ export function HeroSection() {
       {/* ── Imagen de fondo ── */}
       <BackgroundPanel />
 
-      {/* ── Textura grain (requiere keyframe o imagen) ── */}
+      {/* ── Textura grain ── */}
       <div
         aria-hidden
         style={{
@@ -335,6 +285,11 @@ export function HeroSection() {
       </div>
 
       {/* ── Contenido principal ── */}
+      {/*
+        El paddingTop aquí reemplaza el espacio que ocupaba el <Nav>.
+        Usando el mismo clamp del nav original para que el corner accent
+        y el bloque de texto queden perfectamente alineados.
+      */}
       <div
         style={{
           position: "relative",
@@ -343,13 +298,12 @@ export function HeroSection() {
           flexDirection: "column",
           height: "100%",
           padding: "0 clamp(32px, 6vw, 80px)",
+          paddingTop: "clamp(28px, 4vh, 44px)",
           justifyContent: "space-between",
         }}
       >
-        <Nav visible={loaded} />
-
         {/* ── Bloque de texto principal ── */}
-        <div style={{ paddingBottom: "clamp(48px, 8vh, 88px)", maxWidth: 620 }}>
+        <div style={{ paddingBottom: "clamp(48px, 8vh, 88px)", maxWidth: 620, marginTop: "auto" }}>
 
           {/* Eyebrow */}
           <div
@@ -499,8 +453,6 @@ export function HeroSection() {
             />
           ))}
         </div>
-
-
       </div>
 
     </section>

@@ -44,7 +44,7 @@ export function PhilosophySection() {
           transform: "translateY(-50%)",
           fontSize: "clamp(120px, 18vw, 260px)",
           fontWeight: 800,
-          color: "transparent",
+          color: "black",
           WebkitTextStroke: "1px rgba((0.145 0 0,0.04)",
           fontFamily: "var(--font-sans)",
           letterSpacing: "-0.05em",
