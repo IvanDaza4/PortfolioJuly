@@ -22,7 +22,7 @@ type FilterOption = "render" | "planta"
 
 const FILTER_OPTIONS: { value: FilterOption; label: string }[] = [
   { value: "render", label: "Render" },
-  { value: "planta", label: "Planos" },
+  { value: "planta", label: "Plantas" },
 ]
 
 export function ProjectDetail({ project, prevProject, nextProject }: ProjectDetailProps) {
