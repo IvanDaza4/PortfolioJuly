@@ -17,7 +17,7 @@ const cormorant = Cormorant_Garamond({
 })
 
 export const metadata: Metadata = {
-  title: "Julieta Méndez · Arquitectura",
+  title: "JB · Arquitectura",
   description:
     "Estudio de arquitectura especializado en obra residencial, cultural y de paisaje. Proyectos que articulan silencio, escala y emoción desde Buenos Aires, Argentina.",
   keywords: [
@@ -38,7 +38,10 @@ export const metadata: Metadata = {
     locale: "es_AR",
     type: "website",
   },
-  generator: "v0.app",
+  icons: {
+    icon: "/jb.ico",
+  }
+
 }
 
 export const viewport: Viewport = {
