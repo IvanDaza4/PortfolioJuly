@@ -66,7 +66,7 @@ export function MenuOverlay({ open, onClose }: MenuOverlayProps) {
         {SECTIONS.map((item, i) => (
           <a
             key={item.id}
-            href={`#${item.id}`}
+            href={`/#${item.id}`}
             onClick={onClose}
             data-hover
             style={{
@@ -138,7 +138,7 @@ export function MenuOverlay({ open, onClose }: MenuOverlayProps) {
             textDecoration: "none",
           }}
         >
-          hola@julietaarq.com
+          julybruzz@gmail.com
         </a>
       </div>
     </div>
