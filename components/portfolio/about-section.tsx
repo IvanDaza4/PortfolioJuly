@@ -42,6 +42,7 @@ const SKILLS = [
 export function AboutSection() {
   const [visible, setVisible] = useState(false)
   const [imgError, setImgError] = useState(false)
+  const [cvHovered, setCvHovered] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -289,6 +290,67 @@ export function AboutSection() {
                 — Julieta, 2026
               </figcaption>
             </figure>
+
+            {/* ─── CV Download Button ─────────────────────────────────────── */}
+            <a
+              href="/Julieta Bruzzese Estraviz - CV.pdf"
+              download
+              aria-label="Descargar CV de Julieta Bruzzese en PDF"
+              onMouseEnter={() => setCvHovered(true)}
+              onMouseLeave={() => setCvHovered(false)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 12,
+                marginTop: 32,
+                padding: "14px 24px",
+                border: `1px solid ${cvHovered ? "var(--oak)" : "rgba(200,196,188,0.15)"}`,
+                color: cvHovered ? "var(--oak)" : "var(--cement)",
+                textDecoration: "none",
+                fontSize: 10,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                transition: "all 0.3s ease",
+                background: cvHovered ? "rgba(184,149,106,0.06)" : "transparent",
+                cursor: "pointer",
+              }}
+            >
+              {/* Download icon */}
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                style={{
+                  color: cvHovered ? "var(--oak)" : "var(--cement)",
+                  transition: "transform 0.3s ease",
+                  transform: cvHovered ? "translateY(2px)" : "translateY(0)",
+                  flexShrink: 0,
+                }}
+              >
+                <path
+                  d="M12 3v13M12 16l-4-4M12 16l4-4M3 20h18"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Descargar CV
+              {/* Right accent line */}
+              <span
+                style={{
+                  display: "inline-block",
+                  width: cvHovered ? 24 : 12,
+                  height: 1,
+                  background: cvHovered ? "var(--oak)" : "rgba(200,196,188,0.3)",
+                  transition: "all 0.3s ease",
+                  marginLeft: 4,
+                }}
+              />
+            </a>
+            {/* ──────────────────────────────────────────────────────────────── */}
+
           </div>
 
           {/* Content */}
@@ -358,8 +420,6 @@ export function AboutSection() {
                 marginBottom: 48,
               }}
             />
-
-
 
             <div
               style={{
