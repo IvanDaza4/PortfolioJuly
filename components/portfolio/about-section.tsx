@@ -164,7 +164,7 @@ export function AboutSection() {
               >
                 <img
                   src="/fotoperfil.jpeg"
-                  alt="Julieta Bruzzese — Arquitecta"
+                  alt="Julieta Bruzzese Estraviz — Arquitecta"
                   onError={() => setImgError(true)}
                   style={{
                     position: "absolute",
@@ -376,7 +376,7 @@ export function AboutSection() {
               >
                 Julieta
                 <br />
-                <span style={{ color: "var(--oak)" }}>Bruzzese</span>
+                <span style={{ color: "var(--oak)" }}>Bruzzese Estraviz</span>
               </h2>
               <p
                 style={{
